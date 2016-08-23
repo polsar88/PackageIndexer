@@ -37,10 +37,10 @@ class PackageIndexerTest(unittest.TestCase):
     def testReceiveRequest(self, sendMock, processRequestMock, recvMock):
         # Empty message.
         recvMock.return_value = b''
-        self.indexer.receiveRequest()
+        self.assertRaises(ConnectionAbortedError, self.indexer.receiveRequest)
         recvMock.assert_called_once_with(PackageIndexer.TCP_SOCKET_BUFFER_BYTES)
         self.assertFalse(processRequestMock.called)
-        sendMock.assert_called_once_with(PackageIndexer.RES_ERROR + PackageIndexer.NEWLINE)
+        self.assertFalse(sendMock.called)
 
         # Malformed message comes in 1 packet.
         recvMock.reset_mock()

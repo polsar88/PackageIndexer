@@ -63,13 +63,16 @@ class PackageIndexer(BaseRequestHandler):
             if len(packet) == 0 or packet[-1 : ] == PackageIndexer.NEWLINE:
                 break
 
+        if len(data) == 0:
+            raise ConnectionAbortedError
+
         # Log client request.
         self.logger.info(
             'Request from %s:%d received: %s' % (self.client_address[0], self.client_address[1], repr(data)))
 
-        # If the request message is empty, does not end with a newline, or there is a newline somewhere else
-        # than at the end, it is invalid. Otherwise, we process the request.
-        if len(data) == 0 or data[-1 : ] != PackageIndexer.NEWLINE:
+        # If the request message does not end with a newline, or there is a newline somewhere else than at the end,
+        # it is invalid. Otherwise, we process the request.
+        if data[-1 : ] != PackageIndexer.NEWLINE:
             responseMsg = PackageIndexer.RES_ERROR
         else:
             requestMsg = data.strip()  # Chop off the leading and trailing whitespace.
